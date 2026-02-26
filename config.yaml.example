@@ -1,0 +1,32 @@
+# Cloudflare DDNS 配置示例
+# 請根據實際情況修改以下配置
+
+# 全局配置
+global:
+  check_interval: 600  # 檢查間隔(秒)
+  ip_check_urls:       # 檢查 IP 的網站（可自行增加）
+    - "https://api.ipify.org"
+    - "https://icanhazip.com"
+    - "https://ident.me"
+    - "https://4.ipw.cn"
+
+# Cloudflare 配置
+cloudflare:
+  api_token: "your-cloudflare-api-token-here"  # 替換為您的 API Token
+
+# DNS 記錄配置
+dns_records:
+  - name: "www.example.com"
+    type: "A"
+    proxied: true   # Proxy 狀態：打開小雲朵 true，關閉 = false
+    ttl: 1          # 1 = 自動 TTL，1 分鐘 = 60（秒數）
+
+# Webhook 配置
+webhook:
+  enabled: true
+  type: "telegram"  # 新增：telegram 或 generic
+  url: "https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage"
+  chat_id: "your_chat_id_here"
+  on_success: true
+  on_failure: true
+  template: "text"  # 改為 text, markdown, 或 html  

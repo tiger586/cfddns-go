@@ -1,0 +1,11 @@
+services:
+  cfddns:
+    image: alpine:latest
+    container_name: cfddns
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./app:/app # 將目前目錄掛載到容器內的 /app 目錄
+    working_dir: /app # 指定工作目錄，在此目錄下執行命令
+    command: ./cfddns run # 執行程式
