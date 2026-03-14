@@ -593,8 +593,8 @@ func (d *DDNSService) Stop() {
 }
 
 // 獲取服務狀態信息
-func (d *DDNSService) GetStatus() map[string]interface{} {
-	status := make(map[string]interface{})
+func (d *DDNSService) GetStatus() map[string]any {
+	status := make(map[string]any)
 	status["current_ip"] = d.currentIP
 	status["dns_records"] = d.dnsIPs
 	status["last_check"] = d.lastCheck.Format("2006-01-02 15:04:05")

@@ -129,8 +129,8 @@ func (c *Config) loadDotEnv() {
 		return
 	}
 
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(string(data), "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
@@ -188,22 +188,22 @@ func (c *Config) GetConfigSource() map[string]string {
 
 // 驗證配置是否完整
 func (c *Config) Validate() error {
-	msg := ""
+	var msg strings.Builder
 	if c.Cloudflare.APIToken == "" {
 		// return fmt.Errorf("Cloudflare API Token 未設置")
-		msg += "   Cloudflare API Token 未設置\n"
+		msg.WriteString("   Cloudflare API Token 未設置\n")
 	}
 
 	if len(c.DNSRecords) == 0 {
 		// return fmt.Errorf("未配置任何 DNS 記錄")
-		msg += "   未配置任何 DNS 記錄\n"
+		msg.WriteString("   未配置任何 DNS 記錄\n")
 	}
 
 	// 檢查 DNS 記錄的 TTL 設置
 	for _, record := range c.DNSRecords {
 		if record.TTL != 1 && (record.TTL < 60 || record.TTL > 86400) {
 			// return fmt.Errorf("記錄 %s 的 TTL 值無效: %d (必須為 1=自動 或 60-86400 秒)", record.Name, record.TTL)
-			msg += fmt.Sprintf("   記錄 %s 的 TTL 值無效: %d (必須為 1=自動 或 60-86400 秒)\n", record.Name, record.TTL)
+			msg.WriteString(fmt.Sprintf("   記錄 %s 的 TTL 值無效: %d (必須為 1=自動 或 60-86400 秒)\n", record.Name, record.TTL))
 		}
 	}
 
@@ -211,16 +211,16 @@ func (c *Config) Validate() error {
 	if c.Webhook.Enabled {
 		if c.Webhook.URL == "" {
 			// return fmt.Errorf("Webhook 已啟用但未設置 URL")
-			msg += "   Webhook 已啟用但未設置 URL\n"
+			msg.WriteString("   Webhook 已啟用但未設置 URL\n")
 		}
 		if c.Webhook.Type == "telegram" && c.Webhook.ChatID == "" {
 			// return fmt.Errorf("Telegram Webhook 需要設置 Chat ID")
-			msg += "   Telegram Webhook 需要設置 Chat ID\n"
+			msg.WriteString("   Telegram Webhook 需要設置 Chat ID\n")
 		}
 	}
 
-	if msg != "" {
-		return fmt.Errorf(msg)
+	if msg.String() != "" {
+		return fmt.Errorf(msg.String())
 	} else {
 		return nil
 	}

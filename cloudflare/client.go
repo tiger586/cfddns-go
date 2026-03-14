@@ -415,10 +415,3 @@ func maskString(s string, showLen int) string {
 	}
 	return s[:min(showLen, len(s))] + "..."
 }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

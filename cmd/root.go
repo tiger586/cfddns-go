@@ -26,7 +26,7 @@ var (
 
 // 共用輔助函數
 func printSeparator(length int) {
-	for i := 0; i < length; i++ {
+	for range length {
 		fmt.Print("=")
 	}
 	fmt.Println()
@@ -37,13 +37,6 @@ func maskString(s string, showLen int) string {
 		return "***"
 	}
 	return s[:min(showLen, len(s))] + "***"
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func Execute() {
