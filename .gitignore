@@ -30,3 +30,5 @@ release/
 
 # 紀錄
 ip_cache.json
+*.tar
+*.gz

@@ -82,20 +82,31 @@ func getCacheFilePath() string {
 	return "ip_cache.json"
 }
 
-// 等待網路連線
-func waitForNetwork() {
-	time.Sleep(5 * time.Second)
+// 檢查網路是否準備好
+func (d *DDNSService) isNetworkReady() bool {
+	// 嘗試連接 Cloudflare API 的 DNS 伺服器
+	conn, err := net.DialTimeout("tcp", "1.1.1.1:53", 3*time.Second)
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
+}
 
-	for {
-		conn, err := net.DialTimeout("tcp", "1.1.1.1:53", 3*time.Second)
-		if err == nil {
-			conn.Close()
-			fmt.Println("network ready")
+// 等待網路準備好
+func (d *DDNSService) waitForNetwork() {
+	maxAttempts := 12 // 最多等待 60 秒 (12 * 5秒)
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		if d.isNetworkReady() {
+			if attempt > 1 {
+				fmt.Printf("✅ 網路已準備好 (等待了 %d 秒)\n", (attempt-1)*5)
+			}
 			return
 		}
-		fmt.Println("network not ready, retrying...")
-		time.Sleep(2 * time.Second)
+		fmt.Printf("⏳ 等待網路就緒 (%d/%d)...\n", attempt, maxAttempts)
+		time.Sleep(5 * time.Second)
 	}
+	fmt.Println("⚠️  網路連接檢查超時，繼續嘗試...")
 }
 
 // 載入 IP 暫存資料
@@ -496,7 +507,7 @@ func (d *DDNSService) updateSingleRecord(record *config.DNSRecord, newIP string)
 
 func (d *DDNSService) Start() error {
 	// 等待網路連線
-	waitForNetwork()
+	d.waitForNetwork()
 
 	ticker := time.NewTicker(time.Duration(d.config.Global.CheckInterval) * time.Second)
 	defer ticker.Stop()
